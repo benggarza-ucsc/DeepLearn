@@ -1,0 +1,57 @@
+make ANN machine
+	Read in fits data
+	Set up feature vector
+	Set up class vector
+	(for first run through with g-r and n_r example) filter bad values
+		for future - within 1*sigma?
+	divide training set and validation set
+	plot feature histograms and feature space
+	train
+	run validation
+	calculate fpr, tpr, auc
+
+determine optimal feature set from nair-abraham fits data
+	forwards feature selection (Brink et al. 2013), because example used two features,
+	it is apparent that the machine works well with small feature sets
+
+	Forwards Feature Selection Algorithm:
+	Full Set Num Selections = [Full Set]
+	Repeat 5 times:
+		Feature Set = [0]
+		FoM = 0
+		while FoM improving or feature set != full set:
+			potential features = Full set - feature set
+			potential feature fom = [potential features]
+			for each feature in potential features:
+				calculate fom on machine with feature set + feature
+				fom -> potential feature fom[feature]
+			find potential feature with best fom
+			if fom better than FoM:
+				Add feature to Feature Set
+				FoM = fom
+			else:
+				stop
+		Full Set Num Selections[Feature Set] ++
+	Final Feature Set = Full Set[Full Set Num Selections >= 2]
+
+determine optimal paramters for ANN
+	hidden layers: number and size of each
+
+	Paramater Optimizing Algorithm (Grid Search):
+	Repeat 10 times:
+		Hidden Layers[i] = ()
+		FoM=0
+		while FoM improving or num hidden layers < MAX_HIDDEN_LAYERS:
+			new layer fom = [MAX_LAYER_SIZE]
+			for layer with size from 1 to MAX_LAYER_SIZE:
+				calculate fom on machine with Hidden Layers + layer
+				fom -> new layer fom[size]
+			find layer size with best fom
+			if fom better than FoM:
+				Add layer with size to Hidden Layers
+				FoM = fom
+			else:
+				stop
+	num layers = average length of hidden layers
+	final hidden layers = [num layers]
+	final hidden layers[i] = average size of hidden layer i

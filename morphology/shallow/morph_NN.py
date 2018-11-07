@@ -18,20 +18,18 @@ from sklearn.model_selection import train_test_split
 
 def NN_test(feature_names, hidden_layers):
     # Get FITS data
-    cat = "C:/Users/garza/Documents/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
+    cat = "/home/ben/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
     data = fits.getdata(cat,1)
     # Print FITS data
-    t = Table(data)
-    """
-    print(t)
-    print(t.colnames)"""
+    #t = Table(data)
+    #print(t.colnames)
 
 
     # Define features and classes
     nf = len(feature_names)
-    feature_names_set = set(feature_names)
-    features = data[[i for i, val in enumerate(t.colnames) if val in feature_names_set]]
-
+    features = []
+    for i in range(nf):
+        features.append(data[feature_names[i]])
 
     # Time type
     ttype = data["TType"]
@@ -53,16 +51,22 @@ def NN_test(feature_names, hidden_layers):
     class_vector = c[p]
 
     # Feature vector
-
+    
     feature_vector = np.zeros((class_vector.shape[0], nf))
-    for i in range(nf-1):
-        feature_vector[:, i] = features[i][p]
+
+    for i in range(nf):
+        try:
+            feature_vector[:, i] = features[i][p]
+        except:
+            print("Feature contains non-numerical data, training failed")
+            # Simulates worst-case efficiency by returning an AUC of 0
+            return 0
 
 
     # Divide training set and test set
     X_train, X_test, y_train, y_test = train_test_split(feature_vector, class_vector, test_size=0.33, random_state=69)
     print("Sizes training / test")
-    print(len(X_train[1]), " / ", len(X_test[1]))
+    print(len(X_train), " / ", len(X_test))
 
 
     # Plot feature histograms and feature space
@@ -126,3 +130,7 @@ def NN_test(feature_names, hidden_layers):
     AUC = auc(fpr, tpr)
     print("Area Under Curve: ", AUC)
     return AUC
+
+
+if __name__=="__main__":
+    NN_test(['n_r', 'g-r'], (100, 100))

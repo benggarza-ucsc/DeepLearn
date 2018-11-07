@@ -4,16 +4,20 @@ import matplotlib
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.table import Table
+from time import sleep
 
 
 def forwards_feature_selection():
     hidden_layers = (100, 100, 100)
+    
 
-    cat = "C:/Users/garza/Documents/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
+    # Generate numerical dataset
+    cat = "/home/ben/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
     data = fits.getdata(cat,1)
     all_feature_names = np.array(Table(data).colnames)
-    feature_names = all_feature_names[np.where(all_feature_names != 'TType')]
-    feature_selections = [feature_names.shape]
+    all_feature_names_set = set(all_feature_names)
+    feature_names = all_feature_names[np.where(all_feature_names!="TType")]
+    feature_selections = np.zeros(feature_names.shape)
 
     for i in range(5):
         feature_set = np.empty(0)
@@ -21,22 +25,24 @@ def forwards_feature_selection():
 
         while feature_set.shape < feature_names.shape:
             potential_features = np.setdiff1d(feature_names, feature_set)
-            print(potential_features.shape)
-            potential_features_fom = np.array(potential_features.shape)
+            potential_features_fom = []
 
             # Might be same value repeated, might need to run for loop
             for feature in potential_features:
-                potential_features_fom[np.where(potential_features == feature
-                    )] = NN_test(np.append(feature_set, feature), hidden_layers)
+                print(feature)
+                potential_features_fom.append(NN_test(np.append(feature_set, feature), hidden_layers))
 
             best_fom= np.amax(potential_features_fom)
 
             if best_fom > FoM:
-                np.append(feature_set, potential_features[np.where(potential_features_fom==best_fom)])
+                best_potential_feature = potential_features[np.where(potential_features_fom==best_fom)]
+                feature_set = np.append(feature_set, best_potential_feature)
                 FoM = best_fom
+                print(best_potential_feature, "gave highest FoM of", best_fom, ", adding...")
+                sleep(3)
             else:
                 break
-        feature_selections[np.where(feature_names in feature_set)] += 1
+        feature_selections[np.where(np.in1d(all_feature_names, feature_set)[0])] += 1
 
     final_features = feature_names[np.where(feature_selections >= 2)]
     return final_features

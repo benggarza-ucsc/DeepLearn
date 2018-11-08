@@ -1,0 +1,4 @@
+Optimal Set:
+g-r, boverA, Rp50_g, Rp90_g, Bar, tails, Ring_flag, V/Vmax
+Hidden Layers:
+(192, 12, 181)

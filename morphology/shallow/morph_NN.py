@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 
 def NN_test(feature_names, hidden_layers):
     # Get FITS data
-    cat = "/home/ben/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
+    cat = "/home/ben/Documents/git/DeepLearn/morphology/Nair_Abraham_cat.fit"
     data = fits.getdata(cat,1)
     # Print FITS data
     #t = Table(data)
@@ -58,15 +58,15 @@ def NN_test(feature_names, hidden_layers):
         try:
             feature_vector[:, i] = features[i][p]
         except:
-            print("Feature contains non-numerical data, training failed")
-            # Simulates worst-case efficiency by returning an AUC of 0
-            return 0
+            print("Feature contains non-numerical data, training ended")
+            # Removes feature from consideration by returning an AUC of -1
+            return -1
 
 
     # Divide training set and test set
     X_train, X_test, y_train, y_test = train_test_split(feature_vector, class_vector, test_size=0.33, random_state=69)
-    print("Sizes training / test")
-    print(len(X_train), " / ", len(X_test))
+    # print("Sizes training / test")
+    # print(len(X_train), " / ", len(X_test))
 
 
     # Plot feature histograms and feature space
@@ -110,7 +110,7 @@ def NN_test(feature_names, hidden_layers):
     # Train
     nn = MLPClassifier(hidden_layers, random_state=96)
     nn.fit(X_train, y_train)
-    print("Trained ANN Classifier")
+    print("ANN Classifier Trained\nTraining set size: ", len(X_train), "\nNum features: ", nf)
     # print(nn)
 
 
@@ -118,17 +118,17 @@ def NN_test(feature_names, hidden_layers):
     y_pred = nn.predict_proba(X_test)
     fpr, tpr, thresholds = roc_curve(y_test, y_pred[:, 1])
 
-    """# Plotting ROC
+    # Plotting ROC
     plt.xlabel("FPR", fontsize=20)
     plt.ylabel("TPR", fontsize=20)
     plt.xlim(0, 1)
     plt.ylim(0, 1)
     plt.plot(fpr, tpr, linewidth=3, color='black')
-    plt.show()"""
+    plt.show()
 
     # Calculate AUC
     AUC = auc(fpr, tpr)
-    print("Area Under Curve: ", AUC)
+    print("AUC:", AUC)
     return AUC
 
 
